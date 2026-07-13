@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DS Playground — Panth Shah</title>
+<meta name="description" content="An interactive, animated playground for Stacks, Queues, Linked Lists, Trees, Graphs, Heaps and Tries — by Panth Shah.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+/* ============================= TOKENS ============================= */
+:root{
+  --bg:#f8fafc;
+  --bg2:#f1f5f9;
+  --surface:#ffffff;
+  --surface-strong:#f1f5f9;
+  --border:#e2e8f0;
+  --text:#0f172a;
+  --text-dim:#64748b;
+  --cyan:#3b82f6;
+  --pink:#14b8a6;
+  --purple:#8b5cf6;
+  --amber:#eab308;
+  --green:#10b981;
+  --red:#ef4444;
+  --radius:12px;
+  --radius-sm:8px;
+  --shadow:0 10px 30px rgba(15,23,42,0.08);
+  --font-display:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --font-body:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+}
+html[data-theme="dark"]{
+  --bg:#0f172a;
+  --bg2:#1e293b;
+  --surface:#1e293b;
+  --surface-strong:#27374d;
+  --border:#334155;
+  --text:#f1f5f9;
+  --text-dim:#94a3b8;
+  --cyan:#60a5fa;
+  --pink:#2dd4bf;
+  --purple:#a78bfa;
+  --amber:#facc15;
+  --green:#34d399;
+  --red:#f87171;
+  --shadow:0 10px 30px rgba(0,0,0,0.45);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  min-height:100vh;
+  overflow-x:hidden;
+  transition:background .3s ease,color .3s ease;
+  position:relative;
+}
+::selection{background:var(--cyan); color:#fff;}
+::-webkit-scrollbar{width:10px; height:10px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border); border-radius:10px;}
+a{color:inherit; text-decoration:none;}
+button{font-family:inherit; cursor:pointer;}
+h1,h2,h3,h4{font-family:var(--font-display); letter-spacing:-0.01em;}
+code,.mono{font-family:var(--font-mono);}
+:focus-visible{outline:2px solid var(--cyan); outline-offset:3px; border-radius:4px;}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
+}
+
+/* ============================= NAV ============================= */
+.nav{
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 32px;
+  backdrop-filter:blur(12px);
+  background:color-mix(in srgb, var(--bg) 80%, transparent);
+  border-bottom:1px solid var(--border);
+}
+.nav-brand{display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; font-size:1.05rem;}
+.nav-brand i{color:var(--cyan); font-size:1.3rem;}
+.nav-links{display:flex; align-items:center; gap:6px;}
+.nav-link{
+  padding:9px 16px; border-radius:8px; font-size:.87rem; font-weight:600; color:var(--text-dim);
+  transition:all .2s ease; border:1px solid transparent;
+}
+.nav-link:hover{color:var(--text); background:var(--surface-strong);}
+.nav-link.active{color:#fff; background:linear-gradient(135deg,var(--cyan),var(--pink)); border-color:transparent;}
+.nav-right{display:flex; align-items:center; gap:10px;}
+.theme-btn{
+  width:38px; height:38px; border-radius:8px; border:1px solid var(--border);
+  background:var(--surface-strong); display:flex; align-items:center; justify-content:center;
+  color:var(--text-dim); transition:all .2s ease; position:relative; overflow:hidden;
+}
+.theme-btn:hover{color:var(--cyan); box-shadow:0 0 0 3px color-mix(in srgb, var(--cyan) 20%, transparent);}
+.icon-sun{display:none;}
+html[data-theme="dark"] .icon-moon{display:none;}
+html[data-theme="dark"] .icon-sun{display:block;}
+.hamb{display:none; width:38px; height:38px; border-radius:8px; border:1px solid var(--border); background:var(--surface-strong); align-items:center; justify-content:center; color:var(--text);}
+
+/* ============================= LANDING / HERO ============================= */
+.page{position:relative; z-index:2; display:none;}
+.page.active{display:block;}
+.hero{
+  min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:140px 24px 80px; text-align:center; position:relative;
+}
+.eyebrow{
+  display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:.78rem;
+  color:var(--cyan); background:var(--surface); border:1px solid var(--border);
+  padding:7px 16px; border-radius:999px; margin-bottom:28px; letter-spacing:.03em;
+}
+.eyebrow::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;} 50%{opacity:.3;}}
+.hero h1{
+  font-size:clamp(2.6rem,7vw,5.2rem); font-weight:700; line-height:1.02; max-width:1000px;
+  background:linear-gradient(120deg,var(--text) 30%,var(--cyan) 60%,var(--pink) 90%);
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  margin-bottom:22px;
+}
+.hero p.lead{max-width:620px; color:var(--text-dim); font-size:1.12rem; line-height:1.65; margin-bottom:36px;}
+.hero-ctas{display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-bottom:64px;}
+.btn{
+  padding:14px 28px; border-radius:999px; font-weight:600; font-size:.95rem; border:1px solid var(--border);
+  transition:all .25s cubic-bezier(.2,.8,.2,1); display:inline-flex; align-items:center; gap:8px;
+}
+.btn-primary{background:linear-gradient(135deg,var(--cyan),var(--pink)); color:#fff; border:none;}
+.btn-primary:hover{transform:translateY(-3px); box-shadow:0 14px 30px -8px color-mix(in srgb, var(--cyan) 45%, transparent);}
+.btn-ghost{background:var(--surface); color:var(--text);}
+.btn-ghost:hover{background:var(--surface-strong); transform:translateY(-3px);}
+
+/* Signature morphing visual */
+.morph-stage{
+  width:min(820px,92vw); height:340px; position:relative; border-radius:20px;
+  background:var(--surface); border:1px solid var(--border);
+  box-shadow:var(--shadow); overflow:hidden; margin-bottom:18px;
+}
+.morph-stage::before{
+  content:''; position:absolute; inset:0; background:
+   radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--cyan) 12%, transparent), transparent 45%),
+   radial-gradient(circle at 80% 80%, color-mix(in srgb, var(--pink) 12%, transparent), transparent 45%);
+  pointer-events:none;
+}
+.morph-node{
+  position:absolute; width:46px; height:46px; border-radius:12px;
+  background:linear-gradient(135deg,var(--surface-strong),var(--surface));
+  border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-mono); font-size:.78rem; font-weight:600; color:var(--cyan);
+  transition:transform 1.1s cubic-bezier(.65,0,.35,1), background .4s, border-radius .8s;
+  will-change:transform;
+}
+.morph-node.on{color:var(--pink);}
+.morph-edge{position:absolute; height:2px; background:linear-gradient(90deg,var(--cyan),var(--pink)); opacity:.5; transform-origin:0 0; transition:all 1.1s cubic-bezier(.65,0,.35,1);}
+.morph-label{
+  position:absolute; bottom:14px; left:50%; transform:translateX(-50%); font-family:var(--font-mono);
+  font-size:.82rem; color:var(--text-dim); letter-spacing:.05em; text-transform:uppercase;
+}
+
+.stat-row{display:flex; gap:14px; flex-wrap:wrap; justify-content:center;}
+.stat-chip{
+  padding:12px 20px; border-radius:14px; background:var(--surface); border:1px solid var(--border);
+  font-family:var(--font-mono); font-size:.82rem; color:var(--text-dim); display:flex; align-items:center; gap:8px;
+}
+.stat-chip b{color:var(--text); font-family:var(--font-display); font-size:1rem;}
+
+/* Structures grid on landing */
+.section{max-width:1160px; margin:0 auto; padding:100px 24px;}
+.section-head{max-width:640px; margin-bottom:52px;}
+.section-head .eyebrow{margin-bottom:16px;}
+.section-head h2{font-size:clamp(1.9rem,4vw,2.7rem); margin-bottom:14px;}
+.section-head p{color:var(--text-dim); font-size:1.05rem; line-height:1.6;}
+
+.struct-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px;}
+.struct-card{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:26px; text-align:left; transition:all .3s cubic-bezier(.2,.8,.2,1); position:relative; overflow:hidden;
+  display:flex; flex-direction:column; gap:12px;
+}
+.struct-card::after{content:''; position:absolute; inset:0; opacity:0; transition:opacity .3s; pointer-events:none;
+  background:linear-gradient(135deg, color-mix(in srgb, var(--cyan) 8%, transparent), color-mix(in srgb, var(--pink) 8%, transparent));}
+.struct-card:hover{transform:translateY(-6px); border-color:color-mix(in srgb, var(--cyan) 40%, var(--border)); box-shadow:var(--shadow);}
+.struct-card:hover::after{opacity:1;}
+.struct-icon{width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--surface-strong); color:var(--cyan); font-size:1.3rem;}
+.struct-card h3{font-size:1.15rem; margin-bottom:2px;}
+.struct-card p{color:var(--text-dim); font-size:.88rem; line-height:1.55;}
+.struct-tags{display:flex; gap:6px; flex-wrap:wrap; margin-top:auto;}
+.tag{font-family:var(--font-mono); font-size:.68rem; padding:4px 9px; border-radius:999px; background:var(--surface-strong); color:var(--text-dim); border:1px solid var(--border);}
+.struct-go{font-family:var(--font-mono); font-size:.78rem; color:var(--cyan); display:flex; align-items:center; gap:6px; margin-top:4px;}
+
+/* Footer */
+.footer{border-top:1px solid var(--border); padding:48px 24px; text-align:center; color:var(--text-dim); position:relative; z-index:2;}
+.footer .links{display:flex; gap:22px; justify-content:center; margin-bottom:18px; flex-wrap:wrap;}
+.footer .links a{display:flex; align-items:center; gap:7px; font-size:.9rem; color:var(--text); padding:8px 14px; border-radius:999px; background:var(--surface); border:1px solid var(--border); transition:all .25s;}
+.footer .links a:hover{border-color:var(--cyan); color:var(--cyan); transform:translateY(-2px);}
+.footer small{font-family:var(--font-mono); font-size:.78rem;}
+
+/* ============================= PLAYGROUND ============================= */
+.pg-wrap{padding:110px 20px 60px; max-width:1360px; margin:0 auto; position:relative; z-index:2;}
+.pg-tabs{display:flex; gap:8px; overflow-x:auto; padding-bottom:14px; margin-bottom:24px; scrollbar-width:thin;}
+.pg-tab{
+  flex:0 0 auto; padding:10px 18px; border-radius:12px; background:var(--surface); border:1px solid var(--border);
+  font-weight:600; font-size:.88rem; color:var(--text-dim); display:flex; align-items:center; gap:8px; transition:all .25s;
+}
+.pg-tab:hover{color:var(--text); border-color:color-mix(in srgb, var(--cyan) 30%, var(--border));}
+.pg-tab.active{color:#fff; background:linear-gradient(135deg,var(--cyan),var(--pink)); border-color:transparent;}
+
+.pg-head{display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:22px;}
+.pg-head h2{font-size:2rem;}
+.pg-head p{color:var(--text-dim); max-width:560px; font-size:.95rem; line-height:1.55; margin-top:6px;}
+.complexity-badges{display:flex; gap:8px; flex-wrap:wrap;}
+.cbadge{font-family:var(--font-mono); font-size:.72rem; padding:6px 11px; border-radius:8px; background:var(--surface); border:1px solid var(--border); color:var(--text-dim);}
+.cbadge b{color:var(--cyan);}
+
+.pg-grid{display:grid; grid-template-columns:1.4fr 1fr; gap:20px;}
+@media(max-width:980px){.pg-grid{grid-template-columns:1fr;}}
+
+.panel{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px;}
+.panel-title{font-family:var(--font-display); font-weight:600; font-size:.95rem; margin-bottom:14px; display:flex; align-items:center; gap:8px; color:var(--text-dim); letter-spacing:.02em; text-transform:uppercase; font-size:.75rem;}
+
+.controls{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;}
+.controls input[type=text], .controls input[type=number]{
+  background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:10px 14px; color:var(--text);
+  font-family:var(--font-mono); font-size:.88rem; width:110px; outline:none; transition:border-color .2s;
+}
+.controls input:focus{border-color:var(--cyan);}
+.op-btn{
+  padding:10px 16px; border-radius:10px; border:1px solid var(--border); background:var(--surface-strong);
+  color:var(--text); font-size:.85rem; font-weight:600; transition:all .2s;
+}
+.op-btn:hover{border-color:var(--cyan); color:var(--cyan); transform:translateY(-1px);}
+.op-btn.pink:hover{border-color:var(--pink); color:var(--pink);}
+.op-btn:disabled{opacity:.4; cursor:not-allowed; transform:none;}
+.log-line{font-family:var(--font-mono); font-size:.78rem; color:var(--text-dim); padding:4px 0; border-bottom:1px dashed var(--border);}
+.log-line:last-child{border:none;}
+.log-box{max-height:110px; overflow-y:auto; margin-top:6px;}
+
+.stage{
+  position:relative; height:360px; border-radius:12px; background:var(--bg2);
+  border:1px solid var(--border); overflow:auto;
+}
+.stage-inner{position:relative; min-width:100%; height:100%;}
+.node{
+  position:absolute; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono);
+  font-weight:600; font-size:.85rem; border-radius:10px; background:var(--surface-strong); border:1.5px solid var(--border);
+  color:var(--text);
+  transition:left .55s cubic-bezier(.34,1.1,.4,1), top .55s cubic-bezier(.34,1.1,.4,1),
+             transform .55s cubic-bezier(.34,1.1,.4,1), background .3s, border-color .3s, opacity .35s, width .4s, height .4s;
+  will-change:left,top; user-select:none;
+}
+.node.circle{border-radius:50%;}
+.node.active{border-color:var(--cyan); color:var(--cyan); box-shadow:0 0 0 3px color-mix(in srgb, var(--cyan) 20%, transparent);}
+.node.done{border-color:var(--green); color:var(--green);}
+.node.target{border-color:var(--pink); color:var(--pink); box-shadow:0 0 0 3px color-mix(in srgb, var(--pink) 20%, transparent);}
+.node.enter{opacity:0; transform:scale(.4) translateY(-20px);}
+.node.leave{opacity:0 !important; transform:scale(.3) !important;}
+.node-idx{position:absolute; top:-18px; left:50%; transform:translateX(-50%); font-size:.62rem; color:var(--text-dim); font-family:var(--font-mono);}
+.edge-svg{position:absolute; inset:0; width:100%; height:100%; pointer-events:none;}
+.edge-svg line, .edge-svg path{stroke:var(--border); stroke-width:2; transition:stroke .3s, stroke-width .3s;}
+.edge-svg line.active, .edge-svg path.active{stroke:var(--cyan); stroke-width:2.6;}
+.edge-svg .arrowhead{fill:var(--text-dim);}
+.stage-empty{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--text-dim); font-family:var(--font-mono); font-size:.85rem;}
+
+.tabbar{display:flex; gap:6px; margin-bottom:12px;}
+.tabbar button{padding:7px 14px; border-radius:8px; font-size:.78rem; font-weight:600; background:transparent; border:1px solid var(--border); color:var(--text-dim);}
+.tabbar button.active{background:var(--surface-strong); color:var(--cyan); border-color:var(--cyan);}
+pre.code-block{
+  background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:16px; overflow-x:auto;
+  font-family:var(--font-mono); font-size:.79rem; line-height:1.65; max-height:360px; overflow-y:auto;
+}
+pre.code-block .kw{color:var(--pink);} pre.code-block .tp{color:var(--cyan);} pre.code-block .cm{color:var(--text-dim); font-style:italic;} pre.code-block .st{color:var(--amber);} pre.code-block .fn{color:var(--purple);}
+
+.concept-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:6px;}
+@media(max-width:600px){.concept-grid{grid-template-columns:1fr;}}
+.concept-item{background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:14px;}
+.concept-item h4{font-size:.82rem; color:var(--cyan); margin-bottom:6px; font-family:var(--font-mono);}
+.concept-item p, .concept-item li{font-size:.82rem; color:var(--text-dim); line-height:1.55;}
+.concept-item ul{padding-left:18px; margin-top:4px;}
+table.ctable{width:100%; border-collapse:collapse; font-family:var(--font-mono); font-size:.8rem; margin-top:6px;}
+table.ctable th, table.ctable td{padding:9px 10px; text-align:left; border-bottom:1px solid var(--border); color:var(--text-dim);}
+table.ctable th{color:var(--text); font-size:.72rem; text-transform:uppercase; letter-spacing:.04em;}
+table.ctable td.op{color:var(--text);}
+table.ctable td b{color:var(--cyan);}
+
+/* Cheatsheet page */
+.sheet-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px;}
+.sheet-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px;}
+.sheet-card h3{font-size:1.05rem; margin-bottom:10px; color:var(--cyan);}
+
+/* ============================= BASICS PAGE ============================= */
+.basics-grid{display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;}
+@media(max-width:860px){.basics-grid{grid-template-columns:1fr;}}
+.chart-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:22px;}
+.chart-card h3{font-size:1.05rem; margin-bottom:16px; text-align:center;}
+.chart-wrap{position:relative; height:260px;}
+.chart-caption{color:var(--text-dim); font-size:.82rem; text-align:center; margin-top:14px;}
+
+.topic-block{margin-bottom:56px;}
+.topic-head{display:flex; align-items:center; gap:14px; margin-bottom:18px;}
+.topic-icon{width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0;}
+.topic-head h2{font-size:1.7rem;}
+.topic-body{color:var(--text-dim); line-height:1.7; font-size:1rem;}
+.topic-body p{margin-bottom:12px;}
+.topic-body ul{padding-left:20px; margin:10px 0;}
+.topic-body li{margin-bottom:6px;}
+.topic-body b, .topic-body strong{color:var(--text);}
+.topic-two{display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start;}
+@media(max-width:860px){.topic-two{grid-template-columns:1fr;}}
+
+.warn-box{margin-top:14px; padding:12px 14px; border-radius:10px; background:color-mix(in srgb, var(--red) 10%, transparent); border:1px solid color-mix(in srgb, var(--red) 30%, transparent); color:var(--red); font-size:.85rem; line-height:1.55;}
+
+.basic-table{width:100%; border-collapse:collapse; font-size:.85rem; margin-top:10px;}
+.basic-table th, .basic-table td{padding:10px 12px; text-align:left; border:1px solid var(--border);}
+.basic-table th{background:var(--bg2); font-size:.72rem; text-transform:uppercase; letter-spacing:.03em; color:var(--text-dim);}
+.basic-table td{color:var(--text-dim);}
+.basic-table td.strong{color:var(--text); font-weight:600;}
+.basic-table td.good{color:var(--green); font-family:var(--font-mono);}
+.basic-table td.bad{color:var(--red); font-family:var(--font-mono);}
+.basic-table td.mid{color:var(--amber); font-family:var(--font-mono);}
+
+.vec-panel{background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px;}
+.vec-panel-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:10px; flex-wrap:wrap;}
+.vec-panel-head h4{font-size:.8rem; text-transform:uppercase; letter-spacing:.03em; color:var(--text-dim);}
+.vec-stats{display:flex; gap:14px; font-family:var(--font-mono); font-size:.82rem; color:var(--text-dim); margin-bottom:10px;}
+.vec-stats b{color:var(--text);}
+.vec-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; border:3px solid var(--border); border-radius:10px; padding:10px; transition:all .3s;}
+.vec-grid.alert{border-color:var(--red); animation:vecPulse 1s infinite;}
+@keyframes vecPulse{0%{box-shadow:0 0 0 0 color-mix(in srgb, var(--red) 50%, transparent);} 70%{box-shadow:0 0 0 12px transparent;} 100%{box-shadow:0 0 0 0 transparent;}}
+.vec-slot{height:42px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:600; font-size:.85rem; background:var(--surface); border:1px solid var(--border); color:var(--text-dim); transition:all .3s;}
+.vec-slot.filled{background:linear-gradient(135deg,var(--cyan),var(--pink)); color:#fff; border-color:transparent; animation:vecPop .4s cubic-bezier(.34,1.4,.4,1);}
+@keyframes vecPop{0%{transform:scale(.5); opacity:0;} 70%{transform:scale(1.12);} 100%{transform:scale(1); opacity:1;}}
+.vec-msg{font-size:.78rem; color:var(--red); font-weight:600; margin-top:8px; height:16px; opacity:0; transition:opacity .3s;}
+.vec-msg.show{opacity:1;}
+
+.sort-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-top:16px;}
+.sort-card{background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px;}
+.sort-card h4{font-size:.95rem; margin-bottom:6px; color:var(--cyan);}
+.sort-card p{font-size:.8rem; color:var(--text-dim); line-height:1.5; margin-bottom:8px;}
+.sort-badges{display:flex; gap:6px; flex-wrap:wrap;}
+.sort-badges span{font-family:var(--font-mono); font-size:.68rem; padding:3px 8px; border-radius:999px; background:var(--surface); border:1px solid var(--border); color:var(--text-dim);}
+
+@media(max-width:760px){
+  .nav-links{display:none;}
+  .hamb{display:flex;}
+  .nav-links.mobile-open{
+    display:flex; position:fixed; top:66px; left:16px; right:16px; flex-direction:column;
+    background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:12px; z-index:99; box-shadow:var(--shadow);
+  }
+  .pg-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================= NAV ============================= -->
+<nav class="nav">
+  <div class="nav-brand"><i class="fa-solid fa-diagram-project"></i> DS Playground</div>
+  <div class="nav-links" id="navLinks">
+    <a href="#/" class="nav-link" data-route="/">Home</a>
+    <a href="#/basics" class="nav-link" data-route="/basics">Basics</a>
+    <a href="#/playground/stack" class="nav-link" data-route="/playground">Playground</a>
+    <a href="#/cheatsheet" class="nav-link" data-route="/cheatsheet">Cheatsheet</a>
+    <a href="#/about" class="nav-link" data-route="/about">About</a>
+  </div>
+  <div class="nav-right">
+    <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">
+      <i class="fa-solid fa-moon icon-moon"></i>
+      <i class="fa-solid fa-sun icon-sun"></i>
+    </button>
+    <button class="hamb" id="hambBtn" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</nav>
+
+<!-- ============================= LANDING ============================= -->
+<main class="page" id="page-home">
+  <section class="hero">
+    <div class="eyebrow">7 structures · animated · code included</div>
+    <h1>The Data Structure<br>Playground</h1>
+    <p class="lead">Push, pop, insert, traverse — watch it happen. A visual, animated home for Stacks, Queues, Linked Lists, Trees, Graphs, Heaps and Tries, with runnable code and the theory behind each move.</p>
+
+    <div class="morph-stage" id="morphStage">
+      <div class="morph-label" id="morphLabel">array</div>
+    </div>
+
+    <div class="hero-ctas">
+      <a href="#/playground/stack" class="btn btn-primary">Enter the playground →</a>
+      <a href="#/basics" class="btn btn-ghost">Learn the basics</a>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-chip"><b>7</b>&nbsp;structures</div>
+      <div class="stat-chip"><b>30+</b>&nbsp;animated operations</div>
+      <div class="stat-chip"><b>2</b>&nbsp;languages per snippet</div>
+      <div class="stat-chip"><b>0</b>&nbsp;build steps</div>
+    </div>
+  </section>
+
+  <section class="section" id="structures">
+    <div class="section-head">
+      <div class="eyebrow">explore</div>
+      <h2>Pick a structure</h2>
+      <p>Each one opens into its own workbench: a live visualization, hands-on operations, complexity notes and code in C++ and Python.</p>
+    </div>
+    <div class="struct-grid" id="structGrid"></div>
+  </section>
+
+  <section class="section" style="padding-top:0;">
+    <div class="section-head">
+      <div class="eyebrow">why this exists</div>
+      <h2>Built to make DSA click</h2>
+      <p>Reading pseudocode rarely builds intuition on its own. Watching a heap bubble an element into place, or a trie branch out character by character, does. This playground pairs both.</p>
+    </div>
+    <div class="struct-grid">
+      <div class="struct-card"><div class="struct-icon"><i class="fa-solid fa-eye"></i></div><h3>See it happen</h3><p>Every push, rotation and traversal animates in real time so the mechanics — not just the result — are visible.</p></div>
+      <div class="struct-card"><div class="struct-icon"><i class="fa-solid fa-code"></i></div><h3>Read the code</h3><p>Each operation ships with matching C++ and Python implementations, written the way you'd actually submit them.</p></div>
+      <div class="struct-card"><div class="struct-icon"><i class="fa-solid fa-square-root-variable"></i></div><h3>Know the complexity</h3><p>Big-O for every operation, key formulas, and the trade-offs that decide which structure to reach for.</p></div>
+    </div>
+  </section>
+</main>
+
+<!-- ============================= BASICS ============================= -->
+<main class="page" id="page-basics">
+  <div class="pg-wrap" style="max-width:1100px;">
+    <div class="section-head" style="margin-bottom:36px;">
+      <div class="eyebrow">foundations</div>
+      <h2 style="font-size:2.1rem;">Before the structures — the basics</h2>
+      <p>Arrays, strings, maps and sorting are the building blocks everything else in this playground is made of. Start here if you want the theory, not just the animation.</p>
+    </div>
+
+    <div class="basics-grid">
+      <div class="chart-card">
+        <h3>Time complexity, visualized</h3>
+        <div class="chart-wrap"><canvas id="timeComplexityChart"></canvas></div>
+        <p class="chart-caption">How each Big-O class grows as input size n increases. O(n²) escapes the chart fast — that's the whole point.</p>
+      </div>
+      <div class="chart-card">
+        <h3>Memory overhead per element</h3>
+        <div class="chart-wrap"><canvas id="memoryPieChart"></canvas></div>
+        <p class="chart-caption">Static arrays store mostly raw data. Linked structures spend real space on pointers and metadata.</p>
+      </div>
+    </div>
+
+    <!-- ARRAYS & VECTORS -->
+    <div class="topic-block">
+      <div class="topic-head">
+        <div class="topic-icon" style="background:color-mix(in srgb, var(--cyan) 15%, transparent); color:var(--cyan);"><i class="fa-solid fa-table-cells"></i></div>
+        <h2>Arrays &amp; Dynamic Arrays (Vectors)</h2>
+      </div>
+      <div class="topic-two">
+        <div class="topic-body">
+          <p>An <b>array</b> is a fixed-size, contiguous block of memory — every element sits right next to the last, so jumping to index <code>i</code> is a single pointer calculation: O(1).</p>
+          <p>A <b>vector</b> (C++ <code>vector</code>, Python <code>list</code>, JS <code>Array</code>) is a dynamic array. It over-allocates capacity, and when it runs out, it allocates a new block — usually double the size — copies every element over, and frees the old block.</p>
+          <p>That resize is an expensive O(n) operation, but it happens rarely enough (capacity doubling means it happens O(log n) times over n insertions) that the <b>amortized</b> cost of push_back stays O(1).</p>
+          <div class="warn-box"><i class="fa-solid fa-triangle-exclamation"></i>&nbsp; Inserting or deleting at the <b>front</b> of an array/vector is still O(n) — every later element has to shift.</div>
+        </div>
+        <div class="vec-panel">
+          <div class="vec-panel-head">
+            <h4>Vector resizer — try it</h4>
+            <button class="op-btn" id="bVecAdd">Add Element</button>
+          </div>
+          <div class="vec-stats">Size: <b id="vecSize">0</b>&nbsp; Capacity: <b id="vecCap">4</b></div>
+          <div class="vec-grid" id="vecGrid"></div>
+          <div class="vec-msg" id="vecMsg">Capacity reached — allocating a new O(n) block…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STRINGS -->
+    <div class="topic-block">
+      <div class="topic-head">
+        <div class="topic-icon" style="background:color-mix(in srgb, var(--purple) 15%, transparent); color:var(--purple);"><i class="fa-solid fa-quote-left"></i></div>
+        <h2>Strings</h2>
+      </div>
+      <div class="topic-body">
+        <p>A string is, under the hood, an <b>array of characters</b> — so most array intuition carries over directly: indexing is O(1), and appending to the end is amortized O(1) if the string is backed by a growable buffer.</p>
+        <p>In C++, <code>std::string</code> is mutable and growable much like a vector. In Python and Java, strings are <b>immutable</b> — every "modification" (concatenation, replace, slicing) actually builds a brand-new string, which is why repeatedly concatenating in a loop is a classic O(n²) trap.</p>
+        <table class="basic-table">
+          <thead><tr><th>Operation</th><th>Complexity</th><th>Note</th></tr></thead>
+          <tbody>
+            <tr><td class="strong">Access char at index</td><td class="good">O(1)</td><td>Direct memory offset</td></tr>
+            <tr><td class="strong">Concatenation</td><td class="mid">O(n)</td><td>O(n²) if repeated in a loop without a buffer</td></tr>
+            <tr><td class="strong">Substring / slice</td><td class="mid">O(k)</td><td>k = length of the slice</td></tr>
+            <tr><td class="strong">Search (naive)</td><td class="bad">O(n·m)</td><td>Use KMP / Z-algorithm for O(n+m)</td></tr>
+            <tr><td class="strong">Compare equality</td><td class="mid">O(n)</td><td>Must check char by char in the worst case</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MAPS -->
+    <div class="topic-block">
+      <div class="topic-head">
+        <div class="topic-icon" style="background:color-mix(in srgb, var(--pink) 15%, transparent); color:var(--pink);"><i class="fa-solid fa-hashtag"></i></div>
+        <h2>Hash Maps (Dictionaries)</h2>
+      </div>
+      <div class="topic-body">
+        <p>A map stores <b>key → value</b> pairs. It runs the key through a <b>hash function</b> that turns it into an array index, so lookup skips straight to (roughly) the right bucket instead of scanning everything.</p>
+        <p>Collisions — two keys hashing to the same bucket — are handled by chaining (a small list per bucket) or open addressing (probe to the next free slot). A good hash function keeps buckets short, which is what keeps operations close to O(1) on average.</p>
+        <table class="basic-table">
+          <thead><tr><th>Structure</th><th>Access</th><th>Search</th><th>Insert / Delete</th></tr></thead>
+          <tbody>
+            <tr><td class="strong">Array</td><td class="good">O(1)</td><td class="bad">O(n)</td><td class="bad">O(n)</td></tr>
+            <tr><td class="strong">Hash Map</td><td>—</td><td class="good">O(1) avg</td><td class="good">O(1) avg</td></tr>
+            <tr><td class="strong">Hash Map (worst case)</td><td>—</td><td class="bad">O(n)</td><td class="bad">O(n)</td><td></td></tr>
+            <tr><td class="strong">Balanced BST Map</td><td>—</td><td class="mid">O(log n)</td><td class="mid">O(log n)</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:12px;">Worst case degrades to O(n) when many keys collide into the same bucket — rare with a decent hash function, but the reason languages randomize hash seeds for security.</p>
+      </div>
+    </div>
+
+    <!-- SORTING -->
+    <div class="topic-block">
+      <div class="topic-head">
+        <div class="topic-icon" style="background:color-mix(in srgb, var(--green) 15%, transparent); color:var(--green);"><i class="fa-solid fa-arrow-down-wide-short"></i></div>
+        <h2>Sorting Algorithms</h2>
+      </div>
+      <div class="topic-body">
+        <p>Every sort trades off between time, space, and <b>stability</b> (whether equal elements keep their original relative order). Comparison-based sorts can't beat O(n log n) in the average case — that bound comes straight from the fact that there are n! possible orderings and each comparison only rules out half of them.</p>
+        <table class="basic-table">
+          <thead><tr><th>Algorithm</th><th>Best</th><th>Average</th><th>Worst</th><th>Space</th><th>Stable?</th></tr></thead>
+          <tbody>
+            <tr><td class="strong">Bubble Sort</td><td class="good">O(n)</td><td class="bad">O(n²)</td><td class="bad">O(n²)</td><td class="good">O(1)</td><td>Yes</td></tr>
+            <tr><td class="strong">Selection Sort</td><td class="bad">O(n²)</td><td class="bad">O(n²)</td><td class="bad">O(n²)</td><td class="good">O(1)</td><td>No</td></tr>
+            <tr><td class="strong">Insertion Sort</td><td class="good">O(n)</td><td class="bad">O(n²)</td><td class="bad">O(n²)</td><td class="good">O(1)</td><td>Yes</td></tr>
+            <tr><td class="strong">Merge Sort</td><td class="mid">O(n log n)</td><td class="mid">O(n log n)</td><td class="mid">O(n log n)</td><td class="bad">O(n)</td><td>Yes</td></tr>
+            <tr><td class="strong">Quick Sort</td><td class="mid">O(n log n)</td><td class="mid">O(n log n)</td><td class="bad">O(n²)</td><td class="good">O(log n)</td><td>No</td></tr>
+            <tr><td class="strong">Heap Sort</td><td class="mid">O(n log n)</td><td class="mid">O(n log n)</td><td class="mid">O(n log n)</td><td class="good">O(1)</td><td>No</td></tr>
+          </tbody>
+        </table>
+        <div class="sort-grid">
+          <div class="sort-card"><h4>Bubble / Selection / Insertion</h4><p>Simple O(n²) sorts. Insertion sort is genuinely fast on nearly-sorted data — many languages use it for small sub-arrays inside a bigger sort.</p><div class="sort-badges"><span>in-place</span><span>simple</span></div></div>
+          <div class="sort-card"><h4>Merge Sort</h4><p>Divide, sort each half recursively, merge. Guaranteed O(n log n) — the trade-off is an extra O(n) buffer for merging.</p><div class="sort-badges"><span>divide &amp; conquer</span><span>stable</span></div></div>
+          <div class="sort-card"><h4>Quick Sort</h4><p>Pick a pivot, partition around it, recurse. Fast in practice and in-place, but a bad pivot choice degrades to O(n²).</p><div class="sort-badges"><span>in-place</span><span>cache-friendly</span></div></div>
+          <div class="sort-card"><h4>Heap Sort</h4><p>Build a max-heap, repeatedly extract the max. Guaranteed O(n log n) and O(1) extra space — the same heap from the Heap module powers it.</p><div class="sort-badges"><span>in-place</span><span>no worst-case blowup</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ============================= PLAYGROUND ============================= -->
+<main class="page" id="page-playground">
+  <div class="pg-wrap">
+    <div class="pg-tabs" id="pgTabs"></div>
+    <div id="pgBody"></div>
+  </div>
+</main>
+
+<!-- ============================= CHEATSHEET ============================= -->
+<main class="page" id="page-cheatsheet">
+  <div class="pg-wrap">
+    <div class="section-head" style="margin-bottom:36px;">
+      <div class="eyebrow">quick reference</div>
+      <h2 style="font-size:2.1rem;">The cheatsheet</h2>
+      <p>Time complexity for every structure, side by side. Click any card to jump into its playground.</p>
+    </div>
+    <div class="sheet-grid" id="sheetGrid"></div>
+  </div>
+</main>
+
+<!-- ============================= ABOUT ============================= -->
+<main class="page" id="page-about">
+  <div class="pg-wrap" style="max-width:760px;">
+    <div class="section-head" style="margin-bottom:28px;">
+      <div class="eyebrow">about</div>
+      <h2 style="font-size:2.1rem;">Hi, I'm Panth Shah</h2>
+    </div>
+    <div class="panel" style="padding:32px; line-height:1.75; color:var(--text-dim); font-size:1rem;">
+      <p>I'm an Electronics &amp; Communication Engineering student at Nirma University, splitting my time between competitive programming and building things for the web. This playground started as a way to actually <em style="color:var(--text)">see</em> the data structures I was drilling on Codeforces — so I built the visual version I wished existed.</p>
+      <br>
+      <p>Every structure here — stack, queue, linked list, tree, graph, heap, trie — runs on a small shared animation engine, with real operations, real code, and real complexity notes underneath the visuals.</p>
+      <br>
+      <p>If you spot a bug or want to suggest a structure to add, my inbox and GitHub issues are both open.</p>
+    </div>
+    <div class="footer" style="border:none; padding:32px 0 0;">
+      <div class="links">
+        <a href="https://github.com/PanthShah2007" target="_blank" rel="noopener">GitHub ↗</a>
+        <a href="https://www.linkedin.com/in/panth-shah-445144389" target="_blank" rel="noopener">LinkedIn ↗</a>
+        <a href="mailto:panthshah2007@gmail.com">Email ↗</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer" id="mainFooter">
+  <div class="links">
+    <a href="https://github.com/PanthShah2007" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> GitHub</a>
+    <a href="https://www.linkedin.com/in/panth-shah-445144389" target="_blank" rel="noopener"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
+    <a href="mailto:panthshah2007@gmail.com"><i class="fa-solid fa-envelope"></i> Email</a>
+  </div>
+  <small>Designed &amp; built by Panth Shah · © <span id="yr"></span></small>
+</footer>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+/* ============================================================
+   THEME
+   ============================================================ */
+(function(){
+  const root = document.documentElement;
+  const saved = localStorage.getItem('ds-theme');
+  if(saved) root.setAttribute('data-theme', saved);
+  else if(window.matchMedia('(prefers-color-scheme: dark)').matches) root.setAttribute('data-theme','dark');
+  document.getElementById('themeBtn').addEventListener('click', ()=>{
+    const cur = root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    const next = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('ds-theme', next);
+    if(window.refreshBasicsCharts) window.refreshBasicsCharts();
+  });
+})();
+
+/* mobile nav */
+document.getElementById('hambBtn').addEventListener('click', ()=>{
+  document.getElementById('navLinks').classList.toggle('mobile-open');
+});
+
+/* ============================================================
+   STRUCTURE META
+   ============================================================ */
+const STRUCTS = [
+  {id:'stack', name:'Stack', icon:'fa-layer-group', desc:'LIFO. Push and pop from one end — the call stack, undo history, DFS.', tags:['LIFO','O(1) push/pop']},
+  {id:'queue', name:'Queue', icon:'fa-people-line', desc:'FIFO. Enqueue at the back, dequeue from the front — schedulers, BFS.', tags:['FIFO','O(1) ops']},
+  {id:'linkedlist', name:'Linked List', icon:'fa-link', desc:'Nodes linked by pointers. Cheap inserts, no random access.', tags:['Singly','O(1) insert']},
+  {id:'tree', name:'Binary Search Tree', icon:'fa-network-wired', desc:'Ordered binary tree — insert, search and three classic traversals.', tags:['O(log n)*','Ordered']},
+  {id:'graph', name:'Graph', icon:'fa-diagram-project', desc:'Nodes and edges. Add connections, then watch BFS and DFS spread.', tags:['BFS','DFS']},
+  {id:'heap', name:'Heap', icon:'fa-mountain', desc:'A complete binary tree kept in heap order — priority queues, heapsort.', tags:['O(log n) insert','Min-heap']},
+  {id:'trie', name:'Trie', icon:'fa-sitemap', desc:'A prefix tree for strings — autocomplete, dictionaries, spell-check.', tags:['O(L) lookup','Prefix']},
+];
+
+const grid = document.getElementById('structGrid');
+STRUCTS.forEach(s=>{
+  const el = document.createElement('a');
+  el.href = '#/playground/'+s.id;
+  el.className = 'struct-card';
+  el.innerHTML = `<div class="struct-icon"><i class="fa-solid ${s.icon}"></i></div><h3>${s.name}</h3><p>${s.desc}</p>
+    <div class="struct-tags">${s.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    <div class="struct-go">Open playground →</div>`;
+  grid.appendChild(el);
+});
+
+/* Cheatsheet */
+const sheetData = {
+  stack:[['Push','O(1)'],['Pop','O(1)'],['Peek','O(1)'],['Search','O(n)']],
+  queue:[['Enqueue','O(1)'],['Dequeue','O(1)'],['Peek','O(1)'],['Search','O(n)']],
+  linkedlist:[['Insert head','O(1)'],['Insert tail','O(n)*'],['Delete','O(n)'],['Search','O(n)']],
+  tree:[['Insert (avg)','O(log n)'],['Search (avg)','O(log n)'],['Insert (worst)','O(n)'],['Traversal','O(n)']],
+  graph:[['BFS / DFS','O(V+E)'],['Add edge','O(1)'],['Add node','O(1)'],['Adjacency space','O(V+E)']],
+  heap:[['Insert','O(log n)'],['Extract root','O(log n)'],['Peek','O(1)'],['Build heap','O(n)']],
+  trie:[['Insert word','O(L)'],['Search word','O(L)'],['Prefix search','O(L)'],['Space','O(ALPHABET·N·L)']],
+};
+const sheetGrid = document.getElementById('sheetGrid');
+STRUCTS.forEach(s=>{
+  const rows = sheetData[s.id].map(r=>`<tr><td class="op">${r[0]}</td><td><b>${r[1]}</b></td></tr>`).join('');
+  const card = document.createElement('a');
+  card.href = '#/playground/'+s.id;
+  card.className = 'sheet-card';
+  card.style.display='block';
+  card.innerHTML = `<h3><i class="fa-solid ${s.icon}"></i> ${s.name}</h3><table class="ctable"><tbody>${rows}</tbody></table>`;
+  sheetGrid.appendChild(card);
+});
+
+/* ============================================================
+   ROUTER
+   ============================================================ */
+const pages = {
+  '/': 'page-home',
+  '/basics': 'page-basics',
+  '/playground': 'page-playground',
+  '/cheatsheet': 'page-cheatsheet',
+  '/about': 'page-about',
+};
+function route(){
+  let hash = location.hash.replace('#','') || '/';
+  let base = '/';
+  let sub = null;
+  if(hash.startsWith('/playground')){
+    base = '/playground';
+    const parts = hash.split('/').filter(Boolean); // ['playground','stack']
+    sub = parts[1] || 'stack';
+  } else if(pages[hash] !== undefined){
+    base = hash;
+  }
+  Object.values(pages).forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById(pages[base] || 'page-home').classList.add('active');
+
+  document.querySelectorAll('.nav-link').forEach(a=>a.classList.remove('active'));
+  const navSel = base === '/' ? '/' : base;
+  const active = [...document.querySelectorAll('.nav-link')].find(a=>a.dataset.route === navSel);
+  if(active) active.classList.add('active');
+
+  document.getElementById('navLinks').classList.remove('mobile-open');
+  window.scrollTo({top:0, behavior:'instant' in window ? 'instant':'auto'});
+
+  if(base === '/playground') openPlayground(sub);
+  if(base === '/basics' && window.initBasics) window.initBasics();
+}
+window.addEventListener('hashchange', route);
+window.addEventListener('DOMContentLoaded', route);
+</script>
+
+<!-- Engine + per-structure modules loaded below -->
+<script src="engine.js"></script>
+</body>
+</html>
