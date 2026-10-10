@@ -134,6 +134,16 @@ Helping users understand not only **how** operations work but also **how efficie
 
 Unlike traditional learning resources, DS Playground Pro provides an interactive environment where users can experiment with data structures, observe their behavior in real time, and understand the complexity behind each operation.
 
+## 🚀 How to Explore
+
+- Choose a data structure to explore its operations and behavior.
+- Follow the visual representation to understand how elements change step by step.
+- Compare the C++ and Python implementations to learn how the same data structure can be implemented in different programming languages.
+
+## 🎯 Learning Goals
+
+DS-PlayGround-Pro aims to make data structures and algorithms easier to understand through interactive visualizations, practical examples, and code implementations.
+
 ---
 
 ## 🤝 Contributing
